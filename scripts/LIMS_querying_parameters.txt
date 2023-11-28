@@ -1,0 +1,17 @@
+Example image_series_ids (n=40 total):
+
+1089490217
+1121032541
+1120448780
+1128631395
+
+For each image_series_id, need to query: 
+
+1. CCF registered image volumes 
+2. Metadata:
+	- injection coordinates
+	- Primary injection CCF region
+	- Secondary injection CCF regions (if applicable)
+	- injection volume
+
+

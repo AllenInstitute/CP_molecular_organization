@@ -1,0 +1,16 @@
+# Ignore subfolders
+
+data/**
+figures/**
+refs/**
+manuscript/**
+
+
+# File types
+
+*.npy
+*.csv
+*.nrrd
+*.html
+*.nii
+*.h5

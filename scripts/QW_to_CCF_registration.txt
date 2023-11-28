@@ -1,0 +1,1 @@
+python flip_and_shift_volume.py ../data/input/CP_subdivisions_raw.nrrd ../data/output/CP_subdivisions_regd.nrrd
