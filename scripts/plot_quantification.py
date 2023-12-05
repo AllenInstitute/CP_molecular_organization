@@ -35,6 +35,18 @@ def ccf_order(ontology_filename,region_labels):
     ccf_order = [x for _, x in sorted(zipped_pairs)]
     return pd.api.types.CategoricalDtype(categories=ccf_order, ordered=True), ccf_order_table['name'].values
 
+def normalize_by_volume(summary_ipsi,refvol_path='../data/ccf_volumes/lookup/'):
+    
+    subdivs = summary_ipsi.columns.to_list()
+    
+    for div in subdivs:
+        ref_vol = np.load(f'{refvol_path}{div}_left_hemisphere.npy')
+        vol_size = np.shape(ref_vol)[1]
+        
+        summary_ipsi[div] /= vol_size
+
+    return summary_ipsi
+
 def subset_subcortical():
     
     df = pd.read_csv(path+'cp_subcortical_anterograde_projections.csv')
@@ -49,7 +61,7 @@ def subset_subcortical():
 
 def anterograde_heatmap(projection_table,region_labels,hemisphere='Ipsilateral'):
     
-    ax = sns.heatmap(projection_table, annot=False,vmax=0.2, rasterized=True,cmap='plasma')
+    ax = sns.heatmap(projection_table, annot=False,vmax=5e-8, rasterized=True,cmap='plasma')
     ax.set_yticks(range(len(projection_table)))
     ax.set_yticklabels(region_labels)
     ax.set_xticklabels(list(projection_table.columns))
@@ -127,30 +139,27 @@ path = '../data/'
 
 # ## FIGURE 3 - Anterograde projections to CP subdivisions
 # Corticostriatal projections by subdivision
-# summary_ipsi,summary_contra,_,region_labels = csv_to_plot_matrix(path+'Fig3b_cp_cortical_anterograde_projections.csv',
-#                                                       path+'harris_order_smgrouped.csv',name_col='cortex_region')
+summary_ipsi,summary_contra,_,region_labels = csv_to_plot_matrix(path+'Fig3b_cp_cortical_anterograde_projections.csv',
+                                                      path+'harris_order_smgrouped.csv',name_col='cortex_region')
 
-# # # Subcortical projections by subdivision
-# summary_ipsi_sub,summary_contra_sub,_,region_labels_sub = csv_to_plot_matrix(path+'cp_subcortical_anterograde_projections.csv',
-#                                                       path+'subcortical_order.csv',name_col='region')
+summary_ipsi = normalize_by_volume(summary_ipsi)
+summary_contra = normalize_by_volume(summary_contra)
 
-# summary_ipsi = pd.concat([summary_ipsi,summary_ipsi_sub])
-# summary_contra = pd.concat([summary_contra,summary_contra_sub])
-# region_labels = list(summary_contra.index)
+region_labels = list(summary_contra.index)
 
-# anterograde_heatmap(summary_ipsi,region_labels,'Ipsilateral')
-# anterograde_heatmap(summary_contra,region_labels,'Contralateral')
+anterograde_heatmap(summary_ipsi,region_labels,'Ipsilateral')
+anterograde_heatmap(summary_contra,region_labels,'Contralateral')
 
 # # FIGURE 5 - Anterograde projections to CP by celltype
 
-summary_ipsi,summary_contra,lat,region_labels = csv_to_plot_matrix(path+'cp_layer_projections_L5merged.csv',
-                                                      path+'harris_order_SSp_MOp_merged.csv',
-                                                      name_col='cortex_region',
-                                                      group='cell_type')
+# summary_ipsi,summary_contra,lat,region_labels = csv_to_plot_matrix(path+'cp_layer_projections_L5merged.csv',
+#                                                       path+'harris_order_SSp_MOp_merged.csv',
+#                                                       name_col='cortex_region',
+#                                                       group='cell_type')
 
-celltype_heatmap(summary_ipsi,'Ipsilateral')
-celltype_heatmap(summary_contra,'Contralateral')
-celltype_heatmap(lat,'Difference',colormap='vlag',ymin=-0.5,ymax=0.5)
+# celltype_heatmap(summary_ipsi,'Ipsilateral')
+# celltype_heatmap(summary_contra,'Contralateral')
+# celltype_heatmap(lat,'Difference',colormap='vlag',ymin=-0.5,ymax=0.5)
 
 # # FIGURE 6 - swc data by CP subdivisions
 
