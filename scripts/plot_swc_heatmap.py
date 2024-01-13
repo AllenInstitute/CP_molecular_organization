@@ -59,7 +59,7 @@ def swc_by_subdivision(heatmap_table,order_list,title):
     plt.clf()
 
 df = pd.read_csv('../data/swc_cp_projection_densities_v3.csv')
-order_list = pd.read_csv('../data/harris_order.csv')
+order_list = pd.read_csv('../data/harris_order_SSp_MOp_merged.csv')
 included_regions = np.unique(df['ccf_region'])
 order_list = order_list[order_list['name'].isin(included_regions)]
 

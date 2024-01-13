@@ -64,13 +64,13 @@ def draw_filled_sphere(point, radius, arr, shape, color = [255,255,255]):
 
 
 
-# dir_path = Path('../data/Peng_2021_single_neurons/')
-# cp_mask_filename = '../data/ccf_volumes/CP_bounds_CCFregistered.nrrd' #Change to bounds nrrd to find CP division
-# ontology_metadata = pd.read_csv('../data/MouseAtlas_ontologies_notree.csv')
+dir_path = Path('../data/Peng_2021_single_neurons/')
+cp_mask_filename = '../data/ccf_volumes/CP_bounds_CCFregistered.nrrd' #Change to bounds nrrd to find CP division
+ontology_metadata = pd.read_csv('../data/MouseAtlas_ontologies_notree.csv')
 
-# suffix = '**/*_reg.swc'
+suffix = '**/*_reg.swc'
 
-# file_list = dir_path.glob(suffix)
+file_list = dir_path.glob(suffix)
 
 # for region in ['GPe','GPi','SNr']:
     
@@ -95,11 +95,11 @@ def draw_filled_sphere(point, radius, arr, shape, color = [255,255,255]):
 # colorid = {'6':[75,255,255],'7':[255,0,0], '8': [255,255,0], '9': [0,255,0], '10': [255, 75, 255], '10': [255, 75, 255], '12': [255, 75, 255]}
 # soma_coords = np.empty((1,3))
 
-# for file_name in file_list:
+for file_name in file_list:
 
-#     swc_db = np.genfromtxt(file_name)
-#     soma = swc_db[0,2:5]
-#     soma = [round(x/10) for x in soma]
+    swc_db = np.genfromtxt(file_name)
+    soma = swc_db[0,2:5]
+    soma = [round(x/10) for x in soma]
     
 #     cp_div = cp_npy[soma[2],soma[1],soma[0]]
 
@@ -164,7 +164,7 @@ def draw_filled_sphere(point, radius, arr, shape, color = [255,255,255]):
 
 # save_df.to_csv('../data/Fig6d_CP_single_neuron_output.csv')
 
-save_df = pd.read_csv('../data/Fig6d_CP_single_neuron_output.csv')
+# save_df = pd.read_csv('../data/Fig6d_CP_single_neuron_output.csv')
 
 # stats = save_df.groupby(by=['CP_division','celltype']).mean()
 
@@ -173,24 +173,24 @@ save_df = pd.read_csv('../data/Fig6d_CP_single_neuron_output.csv')
 #     swc_heatmap(stats,output_region)
 
 ## Plot soma locations
-shape = (3,1320,800,570)
-radius = 4
+# shape = (3,1320,800,570)
+# radius = 4
 
-arr = np.zeros(shape,dtype=np.int16)
+# arr = np.zeros(shape,dtype=np.int16)
 
-points = save_df.iloc[:,-4:]
+# points = save_df.iloc[:,-4:]
 
-colors = {'Drd1': [255, 100, 0], 'Drd2': [0, 100, 255]}
+# colors = {'Drd1': [255, 100, 0], 'Drd2': [0, 100, 255]}
 
-for celltype in ['Drd1','Drd2']:
+# for celltype in ['Drd1','Drd2']:
     
-    celltype_soma = points.loc[points['celltype']==celltype]
+#     celltype_soma = points.loc[points['celltype']==celltype]
 
-    point_set = celltype_soma.iloc[:,1:].to_numpy()
+#     point_set = celltype_soma.iloc[:,1:].to_numpy()
 
-    for point in point_set:
-        point = [int(x) for x in point]
-        arr = draw_filled_sphere(point,radius,arr,shape,color = colors[celltype])
+#     for point in point_set:
+#         point = [int(x) for x in point]
+#         arr = draw_filled_sphere(point,radius,arr,shape,color = colors[celltype])
 
-# Save the resulting array to a nrrd
-nrrd.write('../data/CPoutputs_swc_soma.nrrd',arr)
+# # Save the resulting array to a nrrd
+# nrrd.write('../data/CPoutputs_swc_soma.nrrd',arr)

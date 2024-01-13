@@ -107,7 +107,7 @@ ax.set(xticks=list(x))
 ax.set(xticklabels=ccf_region)
 # ax.legend(loc="upper right")
 
-plt.savefig('../figures/Fig4e_ipsi_bilateral_summary.svg')
+plt.savefig('../figures/Fig4e_ipsi_bilateral_summary2.svg')
 
 # fig, axes = plt.subplots(figsize=(10,5), facecolor=facecolor, ncols=2, sharey=True)
 # fig.tight_layout()

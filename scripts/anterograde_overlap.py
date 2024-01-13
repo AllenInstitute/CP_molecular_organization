@@ -122,27 +122,23 @@ def projection_info(args):
 # Define the main function
 def main():
 
-    df = pd.read_table('../data/CP_anterograde_projection_quantification.csv',delimiter=',')
-    # Rbp4-Cre_KL100, C57BL/6J, Tlx3-Cre_PL56
+    metadata = pd.read_table('../data/CP_anterograde_projection_quantification.csv',delimiter=',')
 
     volume_path = '../data/input/masked/'
     
-    for line in ['Rbp4-Cre_KL100', 'C57BL/6J', 'Tlx3-Cre_PL56']:
-        metadata = df[df['Mouse Line']==line]
-    
-        vol_list = metadata['primary structure-abbrev'].astype(str).str.cat(metadata['image id'].astype(str), sep='_').values
-        injection_hemisphere = metadata['Injected Hemisphere'].to_list()
-        
-        args_list = [(vol1,vol2,injection_hemisphere[i],volume_path) for i,vol1 in enumerate(vol_list) for vol2 in vol_list]
-        
-        with open(f'../data/anterograde_cp_overlap_{line}_.csv', mode='a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['Volume1','Volume2','Overlapping_voxels','Dice_coefficient'])
-        
-        # Create a Pool of worker processes
-        print(cpu_count())
-        with Pool(processes=20) as pool:
-            pool.map(projection_info,args_list)
+    vol_list = metadata['primary structure-abbrev'].astype(str).str.cat(metadata['image id'].astype(str), sep='_').values
+    injection_hemisphere = metadata['Injected Hemisphere'].to_list()
+
+    args_list = [(vol1,vol2,injection_hemisphere[i],volume_path) for i,vol1 in enumerate(vol_list) for vol2 in vol_list]
+
+    with open(f'../data/anterograde_cp_overlap.csv', mode='a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Volume1','Volume2','Overlapping_voxels','Dice_coefficient'])
+
+    # Create a Pool of worker processes
+    print(cpu_count())
+    with Pool(processes=50) as pool:
+        pool.map(projection_info,args_list)
         
 if __name__ == '__main__':
     

@@ -9,15 +9,6 @@ import pandas as pd
 import numpy as np
 import SimpleITK as sitk
 import urllib.request as request
-
-def download_volume(experiment_id,path,dtype='anterograde'):
-    if dtype=='anterograde':
-        download_link = f'http://api.brain-map.org/grid_data/download_file/{experiment_id}?image=projection_density&resolution=10'
-    elif dtype == 'ISH':
-        download_link = f'http://api.brain-map.org/grid_data/download/{experiment_id}?include=energy'
-    request.urlretrieve(download_link,filename=f'{path}full/{experiment_id}.nrrd')
-
-        
         
 def sitk_load(annotation_image,extension='nrrd'):
     
@@ -60,14 +51,14 @@ def batch_compress(
         mask_filename='../data/cp_mask.nrrd'
         ):
     
-    full_file_path = path+'full/'
-    filelist = os.listdir(full_file_path)
+    
+    filelist = os.listdir(pathname)
     mask = sitk_load(mask_filename)
     
     for files in filelist:
-    
-        img = sitk_load(full_file_path+files)
-        sitk.WriteImage(multiply_images(img,mask),f'{pathname}masked/{files}', True)
+        if ~os.path.isdir(files):
+            img = sitk_load(pathname+files)
+            sitk.WriteImage(multiply_images(img,mask),f'{pathname}masked/{files}', True)
         
 def subdivision_generator(filename='../data/ccf_volumes/CP_subdivisions_regd.nrrd',
                           mask_filename='../data/ccf_volumes/cp_mask.nrrd'):
@@ -98,7 +89,11 @@ def download_and_mask(metadata_filename,path):
     injection_location = list(metadata['primary injection'])
     
     for this_file in experiment_id:
-        download_volume(this_file)
+        download_link = f'http://api.brain-map.org/grid_data/download_file/{this_file}?image=projection_density&resolution=10'
+        try:
+            request.urlretrieve(download_link,filename=f'{path}full/{this_file}.nrrd')
+        except:
+            continue
     # ccf_annotation = sitk_to_npy(sitk_load('../data/ccf_volumes/annotation_10.nrrd'))
     # cp_id = 672
     
@@ -117,9 +112,9 @@ def download_and_mask(metadata_filename,path):
 
 if __name__ == '__main__':
     
-    path = '../data/input/subcortical/'
-    metadata_filename = '../data/anterograde_subcortical.csv'
-    # download_and_mask(path)
-    # batch_compress(path,'../data/ccf_volumes/cp_mask.nrrd')
+    path = '../data/input/cortical/'
+    # metadata_filename = '../data/anterograde_subcortical.csv'
+    # download_and_mask(metadata_filename,path)
+    batch_compress(path,'../data/ccf_volumes/cp_mask.nrrd')
     # subdivision_generator()
     

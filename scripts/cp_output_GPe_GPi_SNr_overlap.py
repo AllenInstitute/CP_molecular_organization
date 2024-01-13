@@ -22,8 +22,8 @@ def download_volumes(vol_list,volume_path):
     dir_path = Path(volume_path)
     
     for vol in vol_list:
-        
-        full_path = dir_path / str(vol)+'.nrrd'
+        filename = str(vol)+'.nrrd'
+        full_path = dir_path / filename
         if full_path.exists():
             continue
         else:
@@ -32,18 +32,20 @@ def download_volumes(vol_list,volume_path):
             
 def mask_volume_by_region(vol_directory,region_name,ontology_metadata):
     
-    vols = os.listdir(vol_directory)
+    vols_path = Path(vol_directory)
+    vols = list(vols_path.glob("*.nrrd"))
+    
     annotation = sitk_load('../data/ccf_volumes/annotation_10.nrrd')
     mask_region_id = ontology_metadata.loc[ontology_metadata['Acronym']==region_name]['ID'].to_list()[0]
     mask = annotation==mask_region_id
     
     for vol in vols:
-        img_vol = sitk_load(vol_directory+vol)
+        img_vol = sitk_load(vol_directory+vol.name)
         mask = sitk.Cast(mask,img_vol.GetPixelID())
         mask.CopyInformation(img_vol)
         
         img_masked = sitk.Multiply(img_vol,mask)
-        sitk.WriteImage(img_masked,f'{vol_directory}{region_name}/{vol}')
+        sitk.WriteImage(img_masked,f'{vol_directory}{region_name}/{vol.name}',True)
 
 def sitk_load(image_filename,extension='nrrd',fliplr=False):
     """Load image from filename.
@@ -99,7 +101,7 @@ def load_flip_half_volume(volume_filename,injection_hemisphere):
     
 def threshold_image(volume_filename,volume_path,injection_hemisphere='Right'):
     
-    volume = load_flip_half_volume(volume_path+volume_filename+'.nrrd',injection_hemisphere)
+    volume = load_flip_half_volume(volume_path+volume_filename,injection_hemisphere)
     
     return sitk.BinaryThreshold(volume,lowerThreshold=10e-4)
     
@@ -135,7 +137,7 @@ def get_dice_coef(vol1,vol2):
 # Define the function that will be run in parallel
 def projection_info(args):
     
-    vol1_filename,vol2_filename,volume_path=args
+    vol1_filename,vol2_filename,volume_path,ccf_region=args
     
     vol1 = threshold_image(vol1_filename,volume_path)
     vol2 = threshold_image(vol2_filename,volume_path)
@@ -145,7 +147,7 @@ def projection_info(args):
     
     row_info = [vol1_filename,vol2_filename,n_overlap,dice]
     
-    with open(f'../data/anterograde_cp_overlap.csv', mode='a', newline='') as f:
+    with open(f'../data/anterograde_cp_overlap_{ccf_region}.csv', mode='a', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(row_info)
 
@@ -160,35 +162,25 @@ def main():
     
     vol_list = df['image series ID'].to_numpy()
     injection_div = df['manually annotated injection site'].to_numpy()
-    
-    injection_z = metadata.loc[metadata['id'].isin(vol_list)]['injection_z'].to_numpy()
-    hemisphere = []
-    for coord in injection_z:
-        if coord<5700:
-            hemisphere.append('Left')
-        else:
-            hemisphere.append('Right')
-    df['injection_hemisphere'] = hemisphere
 
     volume_path = '../data/input/subcortical/CP_output/'
-    download_volumes()
+    # download_volumes(vol_list,volume_path)
     
-    for ccf_region in regions:
-        mask_volume_by_region(volume_path,ccf_region,ontology_metadata)
+    # for ccf_region in regions:
+    #     mask_volume_by_region(volume_path,ccf_region,ontology_metadata)
     
     for ccf_region in regions:
         path = f'{volume_path}{ccf_region}/'
         vol_list = os.listdir(path)
     
-        args_list = [(vol1,vol2,path) for i,vol1 in enumerate(vol_list) for vol2 in vol_list]
+        args_list = [(vol1,vol2,path,ccf_region) for vol1 in vol_list for vol2 in vol_list]
         
         with open(f'../data/anterograde_cp_overlap_{ccf_region}.csv', mode='a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['Volume1','Volume2','Overlapping_voxels','Dice_coefficient'])
         
         # Create a Pool of worker processes
-        print(cpu_count())
-        with Pool(processes=20) as pool:
+        with Pool(processes=10) as pool:
             pool.map(projection_info,args_list)
         
 if __name__ == '__main__':

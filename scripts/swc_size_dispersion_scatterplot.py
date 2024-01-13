@@ -11,62 +11,64 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+def hex_to_rgb(hex_value):
+    
+    hex_value = hex_value.lstrip("#")
+    
+    return tuple(int(hex_value[i:i+2], 16) for i in (0, 2, 4))
+
 layers = ['L2/3','L5','L5','L6']
 celltypes = ['IT','ET','IT','IT']
 
-df_full = pd.read_table('../data/swc_arbor_stats_ACAd_MOs.csv',sep=',')
+df_full = pd.read_table('../data/swc_arbor_stats.csv',sep=',')
 df_full.dropna(subset=['dispersion'],inplace=True)
 
-df_filt = df_full[df_full['ccf_region'].isin(['ACAd','MOs'])]
+df = df_full#[df_filt['celltype']==celltypes[idx]]
+df = df[df['layer']=='L5']
+df = df[df['celltype'].isin(['ET','IT'])]
 
+size = np.log10(df['size'].values)
+dispersion = df['dispersion'].values
 
-fig,ax = plt.subplots(2,2,figsize=(8,8))
-font = {'family': 'Arial', 'size': 12}
-plt.rc('font', **font)
-ax = ax.flatten()
+colors = [tuple([1,0,0]),tuple([0,0.33,1])]
 
-for idx,axes in enumerate(ax):
+# Scatter plot
+fig = plt.scatter(size,dispersion, c=df['celltype'].map(dict(zip(df['celltype'].unique(), colors))), s=7)
 
-    df = df_filt[df_filt['celltype']==celltypes[idx]]
-    df = df[df['layer']==layers[idx]]
-    
-    proj = pd.read_table('../data/swc_cp_projection_densities_v3.csv',sep=',')
-    color_table = pd.read_table('../data/cortical_module_colors.txt',header=None)[0].to_list()
-    
-    size = np.log10(df['size'].values)
-    dispersion = df['dispersion'].values
-    
-    # proj = proj.loc[proj['experiment_id'].isin(df['experiment_id'].values)]
-    # projn = proj.to_numpy()
-    
-    # colors = sns.color_palette(color_table)
-    colors = [tuple([1,0,0]),tuple([0,0.33,1])]
-    
-    # Scatter plot
-    axes.scatter(size,dispersion, c=df['ccf_region'].map(dict(zip(df['ccf_region'].unique(), colors))), s=7)
-    # Labels and title
-    axes.set_xlabel('Log(number of terminals)')
-    axes.set_ylabel('Dispersion')
-    axes.set_xlim(0,2.5)
-    axes.set_ylim(0,200)
-    # Remove the spines (borders) around each subplot
-    axes.spines['top'].set_visible(False)
-    axes.spines['right'].set_visible(False)
-    # axes.spines['bottom'].set_visible(False)
-    # axes.spines['left'].set_visible(False)
+# Labels and title
+plt.xlabel('Log(number of terminals)')
+plt.ylabel('Dispersion')
+plt.xlim(0,2.5)
+plt.ylim(0,200)
 
-    # df['ccf_region'] = pd.Categorical(df['ccf_region'])
-    
-    # # Customize the colorbar and its labels
-    # cbar = plt.colorbar()
-    # cbar.set_ticks(np.unique(df['ccf_region'].cat.codes))
-    # cbar.set_ticklabels(df['ccf_region'].cat.categories)
-    
-
-
-    
-    # Remove the box around the plot
-    # axes.box(False)
-# plt.show()
 # Show the plot
-plt.savefig('../figures/ExtendedFig10_LACAd_MOs_size_dispersion_by_celltype.svg',dpi=300)
+plt.savefig('../figures/Fig4g_swc_L5_ITvsET.svg',dpi=300,rasterize=True)
+
+
+df = df_full
+
+color_table = pd.read_table('../data/harris_order_smgrouped.csv',sep=',')
+color_table.dropna(subset=['color'],inplace=True)
+
+size = np.log10(df['size'].values)
+dispersion = df['dispersion'].values
+
+colors = []
+for datapoint in df['ccf_region']:
+    
+    region_color = color_table.loc[color_table['name']==datapoint,'color'].values[0]
+    colors.append(region_color)
+
+color_table_values = ['#'+ x for x in colors]
+
+# Scatter plot
+fig = plt.scatter(size,dispersion, c=color_table_values, s=7)
+
+# Labels and title
+plt.xlabel('Log(number of terminals)')
+plt.ylabel('Dispersion')
+plt.xlim(0,2.5)
+plt.ylim(0,200)
+
+# Show the plot
+plt.savefig('../figures/Fig4f_swc_all_size_dispersion.svg',dpi=300)

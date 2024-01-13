@@ -5,7 +5,7 @@ Created on Wed May 31 08:59:04 2023
 @author: ashwin.bhandiwad
 """
 
-import json
+import json,os
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -97,24 +97,39 @@ def load_and_flatmap(image_filename):
 
     return main_max,top_max,left_max    
 
+os.chdir('../data/')
 
 # Initialize flatmap parameters
 layer_thicknesses = get_layer_thickness("avg_layer_depths.json")
+
+
 proj_butterfly_slab,bf_left_boundaries,bf_right_boundaries = initialize_projector()
 
 # Generate flatmaps for each channel
-r_main,r_top,r_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_r.nrrd')
-g_main,g_top,g_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_g.nrrd')
-b_main,b_top,b_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_b.nrrd')
+# r_main,r_top,r_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_r.nrrd')
+# g_main,g_top,g_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_g.nrrd')
+# b_main,b_top,b_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_b.nrrd')
 
-# Combine channels into RGB image
-main_rgb = np.dstack((r_main,g_main,b_main))
-top_rgb = np.dstack((r_top,g_top,b_top))
-left_rgb = np.dstack((r_left,g_left,b_left))
+
+# # Combine channels into RGB image
+# main_rgb = np.dstack((r_main,g_main,b_main))
+# top_rgb = np.dstack((r_top,g_top,b_top))
+# left_rgb = np.dstack((r_left,g_left,b_left))
+
+r_main,r_top,r_left = load_and_flatmap('swc_soma.nrrd')
 
 main_shape = r_main.shape
 top_shape = r_top.shape
 left_shape = r_left.shape
+
+#Add layer lines
+total_thickness = sum(layer_thicknesses.values())
+shape_scale = top_shape[0]/total_thickness
+layer_depth = 0
+for _, layers in layer_thicknesses.items():
+    layer_depth += layers*shape_scale - 0.5
+    r_top[int(layer_depth),int(top_shape[1]/2):] = 255
+    r_left[:,int(layer_depth)] = 255
 
 # Set up a figure to plot them together
 fig, axes = plt.subplots(2, 2,
@@ -126,7 +141,7 @@ fig, axes = plt.subplots(2, 2,
                           figsize=(19.4, 12))
 
 # Plot the surface view
-axes[1, 1].imshow(main_rgb, vmin=0, vmax=1, cmap='Greys_r', interpolation=None)
+axes[1, 1].imshow(r_main, vmin=0, vmax=1, cmap='Greys_r', interpolation=None)
 
 # plot region boundaries
 for k, boundary_coords in bf_left_boundaries.items():
@@ -137,15 +152,16 @@ for k, boundary_coords in bf_right_boundaries.items():
 axes[1, 1].set(xticks=[], yticks=[], anchor="NW")
 
 # Plot the top view
-axes[0, 1].imshow(top_rgb, vmin=0, vmax=1,cmap='Greys_r', interpolation=None)
+axes[0, 1].imshow(r_top, vmin=0, vmax=1,cmap='Greys_r', interpolation=None)
 axes[0, 1].set(xticks=[], yticks=[], anchor="SW")
 
+
 # Plot the side view
-axes[1, 0].imshow(left_rgb, vmin=0, vmax=1, cmap='Greys_r', interpolation=None)
+axes[1, 0].imshow(r_left, vmin=0, vmax=1, cmap='Greys_r', interpolation=None)
 axes[1, 0].set(xticks=[], yticks=[], anchor="NE")
 
 # Remove axes from unused plot area
 axes[0, 0].set(xticks=[], yticks=[])
 sns.despine(ax=axes[0, 0], left=True, bottom=True)
 
-plt.savefig('../figures/ExtendedData7a_injection_locations.tif')
+plt.savefig('../figures/Fig4a_injection_locations.tif')

@@ -34,8 +34,10 @@ if __name__ =='__main__':
     volume = sitk.ReadImage('../data/average_template_10.nrrd')
     volume = sitk.GetArrayFromImage(sitk.PermuteAxes(volume,[2,1,0]))
     volume = 0.8*volume
+    
     swc_path_mouselight = '//allen/programs/celltypes/workgroups/mousecelltypes/_UPENN_fMOST/morphology_data/202205111930_upload_registered_reconstructions/'
     swc_path_gao = '../data/ctx_swcs/'
+    swc_path_peng = '../data/'
 
     swc_df = pd.read_csv('../data/cp_projection_densities.csv')
     
