@@ -60,8 +60,8 @@ def subset_subcortical():
     df.to_csv(path+'cp_subcortical_anterograde_projections.csv')
 
 def anterograde_heatmap(projection_table,region_labels,hemisphere='Ipsilateral'):
-    
-    ax = sns.heatmap(projection_table, annot=False,vmax=5e-8, rasterized=True,cmap='plasma')
+
+    ax = sns.heatmap(projection_table, annot=False,vmax=7e-8, square=True, rasterized=True,cmap='plasma')
     ax.set_yticks(range(len(projection_table)))
     ax.set_yticklabels(region_labels)
     ax.set_xticklabels(list(projection_table.columns))
@@ -70,11 +70,12 @@ def anterograde_heatmap(projection_table,region_labels,hemisphere='Ipsilateral')
     cbar = ax.collections[0].colorbar
     cbar.set_label('Fractional density')
     plt.gcf().set_size_inches(8,16)
-    plt.savefig(f'../figures/anterograde_{hemisphere}_fractional_density.svg', dpi=200)
+    plt.savefig(f'../figures/Fig3b_anterograde_{hemisphere}_fractional_density.svg', dpi=200)
     plt.clf()
     
     
 def celltype_heatmap(projection_table,hemisphere='Ipsilateral',source='Cortical',colormap='plasma',ymin=0,ymax=0.9):
+    
     
     ax = sns.heatmap(projection_table,annot=False,vmin=ymin,vmax=ymax,rasterized=True,cmap=colormap,square=True)
     ax.set_yticks(range(len(projection_table)))
@@ -152,39 +153,14 @@ anterograde_heatmap(summary_contra,region_labels,'Contralateral')
 
 # # FIGURE 5 - Anterograde projections to CP by celltype
 
-# summary_ipsi,summary_contra,lat,region_labels = csv_to_plot_matrix(path+'cp_layer_projections_L5merged.csv',
-#                                                       path+'harris_order_SSp_MOp_merged.csv',
-#                                                       name_col='cortex_region',
-#                                                       group='cell_type')
+summary_ipsi,summary_contra,lat,region_labels = csv_to_plot_matrix(path+'cp_layer_projections_L5merged.csv',
+                                                      path+'harris_order_SSp_MOp_merged.csv',
+                                                      name_col='cortex_region',
+                                                      group='cell_type')
 
-# celltype_heatmap(summary_ipsi,'Ipsilateral')
-# celltype_heatmap(summary_contra,'Contralateral')
-# celltype_heatmap(lat,'Difference',colormap='vlag',ymin=-0.5,ymax=0.5)
-
-# # FIGURE 6 - swc data by CP subdivisions
-
-# dataset = pd.read_table(path+'swc_cp_projection_densities_v3.csv',sep=',')
-# order_labels = pd.read_csv(path+'harris_order_smgrouped.csv')
-# region_labels = order_labels['name']
-
-# l5 = dataset.loc[dataset['layer']=='L5']
-
-# l5_avg = l5.groupby(['ccf_region']).mean()
-# l5_avg = l5_avg.reindex(region_labels)
-# l5_avg.dropna(axis=0,inplace=True)
-
-# swc_heatmap(l5_avg,'swc_l5')
-
-# l5_labels = l5_avg.index.values
-
-# l2 = dataset.loc[dataset['layer']=='L2/3']
-
-# l2_avg = l2.groupby(['ccf_region']).mean()
-# l2_avg = l2_avg.reindex(region_labels)
-# l2_avg = l2_avg[l2_avg.index.isin(l5_labels)]
-
-# swc_heatmap(l2_avg,'swc_l2')
-
+celltype_heatmap(summary_ipsi,'Ipsilateral')
+celltype_heatmap(summary_contra,'Contralateral')
+celltype_heatmap(lat,'Difference',colormap='vlag',ymin=-0.5,ymax=0.5)
 
 
 

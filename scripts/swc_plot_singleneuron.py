@@ -33,7 +33,7 @@ if __name__ =='__main__':
     
     volume = sitk.ReadImage('../data/average_template_10.nrrd')
     volume = sitk.GetArrayFromImage(sitk.PermuteAxes(volume,[2,1,0]))
-    volume = 0.8*volume
+    volume = 0.8*volume #Reduce contrast for overlay
     
     swc_path_mouselight = '//allen/programs/celltypes/workgroups/mousecelltypes/_UPENN_fMOST/morphology_data/202205111930_upload_registered_reconstructions/'
     swc_path_gao = '../data/ctx_swcs/'
@@ -43,8 +43,7 @@ if __name__ =='__main__':
     
     filtered_df = swc_df.loc[swc_df['ccf_region']=='MOs']
     swc_filelist = filtered_df['experiment_id'].values
-    
-    # swc_file = swc_filelist[567]
+
     template_max = volume.max()
     
     sum_ipsi = np.sum(filtered_df.iloc[:,8:14].to_numpy(),axis=1)

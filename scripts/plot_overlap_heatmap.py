@@ -26,15 +26,28 @@ def insert_names(overlap_data,l5):
     
     return overlap_data,l5_ids
 
-def remove_zeros(overlap_data,metadata):
+# def remove_zeros(overlap_data,metadata):
     
-    zeros_list = np.unique(overlap_data.loc[(overlap_data['Dice_coefficient']>1),'Volume1'])
     
-    for vol in zeros_list:
+
+def filter_sparse_projections(overlap_data,metadata,density_metadata,threshold=0.01):
+    
+    remove_list = []
+    density_values = []
+    for exp_id in overlap_data['Volume1'].to_list():
+        fractional_density = density_metadata.loc[(density_metadata['experiment_id']==exp_id),'projection_density_ipsi']
+        density_values.append(np.mean(fractional_density))
+        if np.mean(fractional_density) < threshold:
+            remove_list.append(exp_id) 
+    
+    zeros_list = list(np.unique(overlap_data.loc[(overlap_data['Dice_coefficient']>1),'Volume1']))
+    remove_list += zeros_list
+    
+    for vol in remove_list:
         overlap_data.drop(overlap_data.loc[(overlap_data['Volume1']==vol) | (overlap_data['Volume2']==vol)].index, inplace=True)
         metadata.drop(metadata.loc[metadata['image-series-id']==vol].index,inplace=True)
         
-    return overlap_data,metadata
+    return overlap_data,metadata,density_values
 
 def reorder_dataframe(overlap_data,order_list):
     
@@ -84,8 +97,11 @@ order_list = pd.read_csv(path+'harris_order.csv')['name'].to_list()[:-1]
 
 metadata = pd.read_csv(path+'anterograde_cortical_20230922.csv')
 
+# Remove sparse projections based on fractional density in CP - requires data from Fig 3b.
+density_metadata = pd.read_csv(path+'Fig3b_cp_cortical_anterograde_projections.csv')
+
 # Some cells have Dice coefficient of Inf because of divide by zero.Removing them from analysis
-overlap_data,metadata = remove_zeros(overlap_data,metadata)
+overlap_data,metadata,density_values = filter_sparse_projections(overlap_data,metadata,density_metadata,threshold=0.00001)
 
 l5 = metadata[metadata['injected layer'].str.contains("L5 IT")==True]
 
@@ -103,5 +119,5 @@ assert((overlap_data['Volume1'].unique()==overlap_data['Volume2'].unique()).all(
 heatmap_table = overlap_data.pivot_table(index='Volume1',columns='Volume2',values='Dice_coefficient')
 heatmap_table = heatmap_table.reindex(index=overlap_data['Volume1'].unique(),columns=overlap_data['Volume2'].unique())
 
-overlap_heatmap(heatmap_table,'../figures/Fig3e_L5_cortical_overlap.svg',ticks,order_list)
+# overlap_heatmap(heatmap_table,'../figures/Fig3f_L5_cortical_overlap.svg',ticks,order_list)
 

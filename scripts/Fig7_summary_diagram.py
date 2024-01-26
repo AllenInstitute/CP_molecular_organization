@@ -11,9 +11,9 @@ import plotly.figure_factory as ff
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
 
-# Figure 7a - Sankey diagram
+# Figure 6a - Sankey diagram
 
-df = pd.read_table('../data/Fig6_summary_v2.csv',delimiter=',')
+df = pd.read_table('../data/Fig6_summary.csv',delimiter=',')
 attrs = pd.read_table('../data/Fig6_attrs.csv',delimiter=',')
 
 struct = attrs['structure'].to_numpy()
@@ -70,10 +70,10 @@ fig.write_html("../figures/Fig6.html")
 fig.show(renderer='png')
 fig.write_image('../figures/Fig6a_diagram.svg')
 
-## Fig 7a - Chord diagram
+## Fig 6c - Chord diagram
 
-# df = pd.read_table('../data/Fig7_summary_chord.csv',delimiter=',')
-# attrs = pd.read_table('../data/Fig7_attrs_chord.csv',delimiter=',')
+# df = pd.read_table('../data/Fig6_summary_chord.csv',delimiter=',')
+# attrs = pd.read_table('../data/Fig6_attrs_chord.csv',delimiter=',')
 
 # struct = attrs['structure'].to_numpy()
 # struct_id = attrs['struct_id'].to_numpy()
@@ -93,23 +93,4 @@ fig.write_image('../figures/Fig6a_diagram.svg')
 # # Select the 20 busiest airports
 # busiest = list(routes.groupby('SourceID').count().sort_values('Stops').iloc[-20:].index.values)
 # busiest_airports = chord.select(AirportID=busiest, selection_mode='nodes')
-
-# # Fig 7b
-
-# divs = sitk.ReadImage('../data/ccf_volumes/CP_bounds_CCFregistered.nrrd')
-
-# sections = [640, 728, 839]
-# coronal = [1320 - x for x in sections]
-
-# fig,ax = plt.subplots(3,1,figsize=(60,20))
-# axes = ax.flatten()
-
-# for idx,subax in enumerate(axes):
-    
-#     img = divs[coronal[idx],:,:]
-#     img_npy = sitk.GetArrayViewFromImage(img)
-#     img_half = img_npy[100:500,:].T
-#     subax.imshow(img_half,cmap="Greys")
-
-# plt.savefig('../figures/Fig7b_CPdivisions_coronal_series.svg')
 
