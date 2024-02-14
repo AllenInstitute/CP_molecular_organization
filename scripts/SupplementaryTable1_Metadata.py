@@ -56,9 +56,6 @@ output = pd.DataFrame(data=metadata[1:,],columns=metadata[0,:])
 
 output.to_csv('../data/SupplementalTable1_anterograde')
 
-# Retrograde metadata
-# Used Shenqin's metadata file
-
 
 # Single neuron metadata
 

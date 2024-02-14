@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
 """
-Created on Thu May 11 09:38:24 2023
-
-@author: ashwin.bhandiwad
+Set of functions used to plot Fig 5b, 5d, and 5f.
 """
 import os, re
 import pandas as pd
@@ -17,7 +14,27 @@ def add_suffix(col_name, count):
     else:
         return col_name
     
-def reorder_columns(dataset,order_list):
+def sort_columns_by_order(df,custom_order):
+    
+   # Extracting the first part of each column name
+    first_parts = {col: col.split('_')[0] for col in df.columns}
+
+    # Creating a mapping from the first parts to the custom order
+    order_dict = {key: i for i, key in enumerate(custom_order)}
+
+    # Assigning each column a position based on the custom order
+    # Columns not in the custom order are placed at the end
+    column_order = {col: order_dict.get(part, float('inf')) for col, part in first_parts.items()}
+
+    # Sorting the columns based on the custom order
+    sorted_columns = sorted(column_order, key=lambda col: column_order[col])
+
+    # Reordering the DataFrame columns
+    sorted_df = df[sorted_columns]
+
+    return sorted_df
+    
+def reorder_columns(dataset,order_list,cp_division_order):
     
     ordcols = dataset.columns
     # Count occurrences of each column name
@@ -28,14 +45,17 @@ def reorder_columns(dataset,order_list):
     # Set columns of dataset_cortical with suffixes for duplicated columns
     dataset.columns = ordcols_with_suffix
     
-    ordered_cols = np.sort(np.array(ordcols_with_suffix))
+    # ordered_cols = np.sort(np.array(ordcols_with_suffix))
 
     order_list = [item for item in order_list if any(item in df_row for df_row in dataset.index)]
     
     ordered_dataset = dataset.reindex(index=order_list)
-    ordered_dataset = ordered_dataset.reindex(ordered_cols,axis=1)
-    ordcols = np.sort(ordcols)
-    return ordered_dataset,ordcols
+    ordered_dataset = sort_columns_by_order(ordered_dataset,cp_division_order)
+    # ordered_dataset = ordered_dataset.reindex(ordered_cols,axis=1)
+    
+    ordcols = ordered_dataset.columns
+    ordered_columns_no_suffix = ["_".join(re.split("_",col_name)[:-1]) for col_name in ordcols]
+    return ordered_dataset, ordered_columns_no_suffix
 
 def load_annotate():
     metadata = pd.read_excel(data_filename,sheet_name='metadata')
@@ -71,8 +91,8 @@ def assign_subdivision(metadata):
             div_mask = np.load(cp_mask_path+ipsi_divisions[j])
             in_volume = np.where((div_mask[0,:] == row_coord[0]) & (div_mask[1,:] == row_coord[1]) & (div_mask[2,:] == row_coord[2]))[0]
             if len(in_volume)>0:
-                division.append(cp_divisions[j])
-                print(f'{idx} {j} {row_coord[2]} {row_coord[1]} {1140-row_coord[0]} {cp_divisions[j]}')
+                division.append(cp_division_order[j])
+                print(f'{idx} {j} {row_coord[2]} {row_coord[1]} {1140-row_coord[0]} {cp_division_order[j]}')
                 blank_flag += 1
         if blank_flag<1:
             print(f'{idx} {j} {row_coord[2]} {row_coord[1]} {1140-row_coord[0]} NA')
@@ -94,7 +114,7 @@ def retrograde_heatmap(projection_table,col_order=None,hemisphere='Ipsilateral',
     cbar = ax.collections[0].colorbar
     cbar.set_label('Fractional density')
     plt.gcf().set_size_inches(figsize[0],figsize[1])
-    plt.savefig(f'../figures/retrograde_{hemisphere}_{source}_fractional_density.svg', dpi=300)
+    plt.savefig(f'../figures/Fig5_retrograde_{hemisphere}_{source}_fractional_density.svg', dpi=300)
     plt.clf()
     
 def retrograde_layer_heatmap_divisions(projection_table,zmax=1):
@@ -111,7 +131,7 @@ def retrograde_layer_heatmap_divisions(projection_table,zmax=1):
     cbar = ax.collections[0].colorbar
     cbar.set_label('Fractional density')
     plt.gcf().set_size_inches(12,30)
-    plt.savefig(f'../figures/retrograde_layer_fractional_density.svg',dpi=200)
+    plt.savefig(f'../figures/Fig5_retrograde_layer_fractional_density.svg',dpi=200)
     plt.clf()
     
 def retrograde_layer_heatmap_layer(projection_table,zmax=1):
@@ -152,9 +172,10 @@ def retrograde_layer_heatmap_layer(projection_table,zmax=1):
     plt.savefig(f'../figures/retrograde_layer_combined_fractional_density.svg', dpi=200)
     plt.clf()
     
-def plot_group(dataset,hemisphere):
+def plot_group(dataset,hemisphere,cp_division_order):
     
-    cortical_order = pd.read_csv('../data/harris_order_noSSp.csv')
+    cortical_order = pd.read_csv('../data/harris_order.csv')
+    cortical_order.drop(cortical_order[cortical_order['name']=='SSp'].index,inplace=True)
     order_list = cortical_order['name'].to_list()
     
     dataset = dataset.drop(columns='CP')
@@ -163,7 +184,7 @@ def plot_group(dataset,hemisphere):
     dataset_subcortical= dataset.iloc[:,46:-1].transpose()
     
     dataset_cortical.columns = dataset['celltype_div'].to_numpy()
-    dataset_cortical,cortical_ordcols = reorder_columns(dataset_cortical,order_list)
+    dataset_cortical,cortical_ordcols = reorder_columns(dataset_cortical,order_list,cp_division_order)
     
     
     dataset_subcortical.columns = dataset['celltype_div'].to_list()
@@ -172,7 +193,7 @@ def plot_group(dataset,hemisphere):
     
 
     retrograde_heatmap(dataset_cortical,cortical_ordcols,hemisphere,'Cortical',0.2,[20,10])
-    retrograde_heatmap(dataset_subcortical,None,hemisphere,'Subcortical',0.02,[20,15])
+    retrograde_heatmap(dataset_subcortical,cortical_ordcols,hemisphere,'Subcortical',0.02,[20,15])
 
 data_filename = '../data/retrograde_labeling.xlsx'
 cp_mask_path = '../data/ccf_volumes/subdivisions/lookup/'
@@ -182,12 +203,11 @@ ipsi = pd.read_excel(data_filename,sheet_name='ipsi')
 contra = pd.read_excel(data_filename,sheet_name='contra')
 ipsi_layers = pd.read_excel(data_filename,sheet_name='ipsi_layers')
 
-cp_code = np.linspace(5,10,6,dtype=int)
-cp_divisions = ['CPvm','CPiv','CPbor','CPdm','CPl','CPp']
+cp_division_order = ['CPdm','CPdm/vm','CPvm','CPiv','CPl','CPl/dm','CPl/p','CPp']
 
 ipsi_divisions = [filename for filename in os.listdir(cp_mask_path) if 'ipsi' in filename]
 
-#load_annotate()
+load_annotate()
 
 metadata = pd.read_csv('../data/retrograde_metadata.csv')
 for j in range(0,len(metadata)):
@@ -195,8 +215,8 @@ for j in range(0,len(metadata)):
     contra.loc[(contra['image_series_id'] == metadata.iloc[j]['image_series_id']),'celltype_div'] = metadata.iloc[j]['celltype_div']
     ipsi_layers.loc[(ipsi_layers['image_series_id'] == metadata.iloc[j]['image_series_id']),'celltype_div'] = metadata.iloc[j]['celltype_div']
 
-plot_group(ipsi,'Ipsilateral')
-plot_group(contra,'Contralateral')
+plot_group(ipsi,'Ipsilateral',cp_division_order)
+plot_group(contra,'Contralateral',cp_division_order)
 retrograde_layer_heatmap_layer(ipsi_layers)
 
 

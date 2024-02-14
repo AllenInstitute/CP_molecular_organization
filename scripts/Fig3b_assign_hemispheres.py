@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Apr 13 16:08:17 2023
-
-@author: ashwin.bhandiwad
-"""
+"""Assigns hemisphere label to subcortical experiments based on z coordinate in metadata table."""
 
 import pandas as pd
 import numpy as np

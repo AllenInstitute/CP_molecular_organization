@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 31 08:59:04 2023
-
-@author: ashwin.bhandiwad
+Generates cortical flatmap for anterograde injections, retrograde injections, and swc soma locations.
+Used for Fig 3d and Fig 4a.
+Uses ccf_streamlines package, documented at https://ccf-streamlines.readthedocs.io/en/latest/
 """
 
 import json,os
@@ -99,24 +99,16 @@ def load_and_flatmap(image_filename):
 
 os.chdir('../data/')
 
+# Set up input filename. This should be an 8-bit volume of shape (1320,800,1140)
+input_filename = 'swc_soma.nrrd'
+output_filepath = '../figures/Fig4a_injection_locations.tif'
+
 # Initialize flatmap parameters
 layer_thicknesses = get_layer_thickness("avg_layer_depths.json")
 
-
 proj_butterfly_slab,bf_left_boundaries,bf_right_boundaries = initialize_projector()
 
-# Generate flatmaps for each channel
-# r_main,r_top,r_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_r.nrrd')
-# g_main,g_top,g_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_g.nrrd')
-# b_main,b_top,b_left = load_and_flatmap('../data/ExtendedData7a_injection_locations_b.nrrd')
-
-
-# # Combine channels into RGB image
-# main_rgb = np.dstack((r_main,g_main,b_main))
-# top_rgb = np.dstack((r_top,g_top,b_top))
-# left_rgb = np.dstack((r_left,g_left,b_left))
-
-r_main,r_top,r_left = load_and_flatmap('swc_soma.nrrd')
+r_main,r_top,r_left = load_and_flatmap(input_filename)
 
 main_shape = r_main.shape
 top_shape = r_top.shape
@@ -164,4 +156,4 @@ axes[1, 0].set(xticks=[], yticks=[], anchor="NE")
 axes[0, 0].set(xticks=[], yticks=[])
 sns.despine(ax=axes[0, 0], left=True, bottom=True)
 
-plt.savefig('../figures/Fig4a_injection_locations.tif')
+plt.savefig(output_filepath)

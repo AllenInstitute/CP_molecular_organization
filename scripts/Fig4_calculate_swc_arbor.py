@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jun 13 13:41:25 2023
-
-@author: ashwin.bhandiwad
+Calculate number of terminals in single neuron reconstructions used in Fig 4.
+Uses multiprocessing on a HPC with multiple cores.
 """
 
 import csv,sys
@@ -11,13 +10,15 @@ import numpy as np
 import pandas as pd
 sys.path.append('../src/')
 from swc_tools import *
-# volume = np.zeros((3,1320,800,1140),dtype=np.uint8)
-# def neuron_3d(swc_db,volume):
+
+
+volume = np.zeros((3,1320,800,1140),dtype=np.uint8)
+
+def neuron_3d(swc_db,volume):
     
-#     for point in swc_db:
-#         ccf_coords = tuple([int(n/10) for n in point[2:5]])
-#         #volume[ccf_coords[0],ccf_coords[1],:] = 30
-#         volume[0,ccf_coords] = 255
+    for point in swc_db:
+        ccf_coords = tuple([int(n/10) for n in point[2:5]])
+        volume[0,ccf_coords] = 255
 
 def set_globals():
     

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 15 11:56:43 2023
-
-@author: ashwin.bhandiwad
+Convert single neuron reconstruction into a rasterized volume in CCF space.
+Used for Fig 3d
 """
 
 import sys,nrrd

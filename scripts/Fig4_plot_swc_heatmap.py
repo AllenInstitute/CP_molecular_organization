@@ -32,7 +32,7 @@ def swc_heatmap(heatmap_table,order_list,hemisphere,tick=[],label=[]):
     cbar.set_label('Neurite count')
     
     plt.gcf().set_size_inches(5,10)
-    plt.savefig(f'../figures/{hemisphere}_cortical_swc_projection.svg', dpi=100)
+    plt.savefig(f'../figures/Fig4c_{hemisphere}_cortical_swc_projection.svg', dpi=100)
     plt.clf()
 
 def swc_by_subdivision(heatmap_table,order_list,title):
@@ -55,7 +55,7 @@ def swc_by_subdivision(heatmap_table,order_list,title):
     axes[1].set(xticks=range(len(xticks)),xticklabels = xticks)
     
     plt.gcf().set_size_inches(5,10)
-    plt.savefig(f'../figures/{title}_cortical_swc_projection.svg', dpi=100)
+    plt.savefig(f'../figures/Fig4b_{title}_cortical_swc_projection.svg', dpi=100)
     plt.clf()
 
 df = pd.read_csv('../data/swc_cp_projection_densities_v4.csv')

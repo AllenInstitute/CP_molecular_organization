@@ -89,7 +89,7 @@ def overlap_heatmap(heatmap_table,save_filename,tick=[],label=[]):
     
 path = '../data/'
 for region in ['GPe','GPi','SNr']:
-    overlap_data = pd.read_csv(path+f'Fig6_cp_overlap_{region}.csv')
+    overlap_data = pd.read_csv(path+f'ExtendedDataFig20_cp_overlap_{region}.csv')
     
     metadata = pd.read_csv(path+'CP_anterograde_output.csv')
     plot_order = ['CPdm','CPvm','CPiv','CPl','CPp']
@@ -115,4 +115,4 @@ for region in ['GPe','GPi','SNr']:
     heatmap_table = overlap_data.pivot_table(index='Volume1',columns='Volume2',values='Dice_coefficient')
     heatmap_table = heatmap_table.reindex(index=overlap_data['Volume1'].unique(),columns=overlap_data['Volume1'].unique())
     
-    overlap_heatmap(heatmap_table,f'../figures/Fig6_cp_overlap_{region}.svg',ticks,order_list)
+    overlap_heatmap(heatmap_table,f'../figures/ExtendedDataFig20_cp_overlap_{region}.svg',ticks,order_list)

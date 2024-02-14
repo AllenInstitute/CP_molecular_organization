@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 # Figure 6a - Sankey diagram
 
-df = pd.read_table('../data/Fig6_summary.csv',delimiter=',')
+df = pd.read_table('../data/Fig6_summary_v3.csv',delimiter=',')
 attrs = pd.read_table('../data/Fig6_attrs.csv',delimiter=',')
 
 struct = attrs['structure'].to_numpy()
@@ -68,7 +68,7 @@ fig.update_layout(width=1500,
                   paper_bgcolor='white')
 fig.write_html("../figures/Fig6.html")
 fig.show(renderer='png')
-fig.write_image('../figures/Fig6a_diagram.svg')
+fig.write_image('../figures/Fig6a_diagram_v3.svg')
 
 ## Fig 6c - Chord diagram
 

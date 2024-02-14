@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jul 17 13:07:03 2023
-
-@author: ashwin.bhandiwad
+Plot single neuron morphologies used in Fig 3d
 """
 
 import numpy as np
@@ -23,7 +21,7 @@ swc_df = pd.read_csv('../data/swc_cp_projection_densities.csv')
 swc_df = swc_df[swc_df['ccf_region']=='MOs']
 path = '../data/ctx_swcs/'
 
-
+# Manually select cells based on visual inspection
 cells = {'L23' : ['195049_023','195788_004','194778_046','195617_009'], #ACAd
          'L5IT' : ['200323_002','195616_015','195616_001','195828_056'],
          'L5ET' : ['195047_033','192982_046','200194_097','200198_023'], # ipsi-contra ratio ~0.33

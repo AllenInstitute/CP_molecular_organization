@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr 17 12:14:23 2023
-
-@author: ashwin.bhandiwad
+Generates CP subdivision indices for assignment in Fig 3 and 4.
 """
 
 import os
@@ -35,19 +33,3 @@ for idx,divs in enumerate(subdivisions):
     pts_arr = np.vstack((pts[0],pts[1],ipsi))
     
     np.save(f'{path}lookup\\{div_names[idx]}_ipsi.npy',pts_arr)
-
-# subdivision_vol_list=os.listdir(path)
-# vols = subdivision_vol_list[0]
-# for vols in subdivision_vol_list:
-    
-#     volume = sitk.ReadImage(path+vols)
-#     pts_npy = sitk.GetArrayFromImage(volume)
-#     pts_idx = np.nonzero(pts_npy)
-    
-#     np.save(f'{path}lookup\\{vols[:-5]}_contra.npy',pts_idx)
-    
-#     volume = sitk.Flip(volume,[False,False,True])
-#     pts_npy = sitk.GetArrayFromImage(volume)
-#     pts_idx = np.nonzero(pts_npy)
-    
-#     np.save(f'{path}lookup\\{vols[:-5]}_ipsi.npy',pts_idx)

@@ -104,7 +104,7 @@ path = '../data/'
 overlap_data = pd.read_csv(path+'anterograde_cp_overlap_cortsub.csv')
 overlap_data,subset_ids = subset_subcortical(overlap_data)
 overlap_data.drop_duplicates(subset=['Volume1', 'Volume2'],inplace=True)
-no_signal =  [288321385,310193233,312240825,178489574,301466249,292212456,182805965]
+no_signal =  [288321385,310193233,312240825,178489574,301466249,292212456,182805965] #Some volumes have no signal. Removing.
 overlap_data = overlap_data[~overlap_data['Volume2'].isin(no_signal)]
 
 sub_metadata = pd.read_csv(path+'anterograde_subcortical.csv')

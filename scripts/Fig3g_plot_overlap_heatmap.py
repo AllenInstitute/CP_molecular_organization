@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Apr 20 09:08:37 2023
-
-@author: ashwin.bhandiwad
+Plot pairwise overlap in anterograde dataset for Fig 3g.
 """
 
 import pandas as pd
@@ -26,9 +24,6 @@ def insert_names(overlap_data,l5):
     
     return overlap_data,l5_ids
 
-# def remove_zeros(overlap_data,metadata):
-    
-    
 
 def filter_sparse_projections(overlap_data,metadata,density_metadata,threshold=0.01):
     
@@ -101,7 +96,7 @@ metadata = pd.read_csv(path+'anterograde_cortical_20230922.csv')
 density_metadata = pd.read_csv(path+'Fig3b_cp_cortical_anterograde_projections.csv')
 
 # Some cells have Dice coefficient of Inf because of divide by zero.Removing them from analysis
-overlap_data,metadata,density_values = filter_sparse_projections(overlap_data,metadata,density_metadata,threshold=0.00001)
+overlap_data,metadata,density_values = filter_sparse_projections(overlap_data,metadata,density_metadata,threshold=0.01)
 
 l5 = metadata[metadata['injected layer'].str.contains("L5 IT")==True]
 
@@ -119,5 +114,5 @@ assert((overlap_data['Volume1'].unique()==overlap_data['Volume2'].unique()).all(
 heatmap_table = overlap_data.pivot_table(index='Volume1',columns='Volume2',values='Dice_coefficient')
 heatmap_table = heatmap_table.reindex(index=overlap_data['Volume1'].unique(),columns=overlap_data['Volume2'].unique())
 
-# overlap_heatmap(heatmap_table,'../figures/Fig3f_L5_cortical_overlap.svg',ticks,order_list)
+overlap_heatmap(heatmap_table,'../figures/Fig3e_L5_cortical_overlap.svg',ticks,order_list)
 

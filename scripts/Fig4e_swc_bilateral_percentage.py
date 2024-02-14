@@ -107,23 +107,4 @@ ax.set(xticks=list(x))
 ax.set(xticklabels=ccf_region)
 # ax.legend(loc="upper right")
 
-plt.savefig('../figures/Fig4e_ipsi_bilateral_summary2.svg')
-
-# fig, axes = plt.subplots(figsize=(10,5), facecolor=facecolor, ncols=2, sharey=True)
-# fig.tight_layout()
-
-# axes[0].barh(range(len(df)), df['ipsi_only_neurons'].to_numpy(), align='center', color=color_red, zorder=10)
-# axes[0].set_title('Ipsilateral', pad=15, **hfont)
-# axes[1].barh(range(len(df)), df['bilateral_neurons'].to_numpy(), align='center', color=color_blue, zorder=10)
-# axes[1].set_title('Bilateral', pad=15, **hfont)
-# # If you have positive numbers and want to invert the x-axis of the left plot
-# axes[0].invert_xaxis() 
-# axes[0].set(yticks=range(len(df)), yticklabels=df['ccf_region'].to_list())
-# axes[0].yaxis.tick_left()
-# axes[0].set(xticks=[0,50,100,150,200,250,300,350,400])
-# axes[1].set(xticks=[0,50,100,150,200,250,300,350,400])
-
-# # To show data from highest to lowest
-# plt.gca().invert_yaxis()
-
-# plt.savefig('../figures/swc_bilateral_percentage.svg',dpi=100)
+plt.savefig('../figures/Fig4e_ipsi_bilateral_summary.svg')

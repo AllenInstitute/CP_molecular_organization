@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Mar 15 13:35:43 2023
-
-@author: ashwin.bhandiwad
+Set of functions used to plot heatmaps split by CP subdivision.
+Used in Fig 3b and ExtendedData Fig 11. 
 """
 import re
 import pandas as pd
@@ -86,7 +85,7 @@ def celltype_heatmap(projection_table,hemisphere='Ipsilateral',source='Cortical'
     cbar = ax.collections[0].colorbar
     cbar.set_label('Fractional density')
     plt.gcf().set_size_inches(8,16)
-    plt.savefig(f'../figures/{hemisphere}_celltype_fractional_density.svg', dpi=200)
+    plt.savefig(f'../figures/ExtendedData_{hemisphere}_celltype_fractional_density.svg', dpi=200)
     plt.clf()
     
 def swc_heatmap(projection_table,savefile,colormap='plasma',ymin=0,ymax=50):
@@ -137,7 +136,6 @@ def csv_to_plot_matrix(projection_filepath,ccf_order_filepath,name_col='cortex_r
 
 path = '../data/'
 
-
 # ## FIGURE 3 - Anterograde projections to CP subdivisions
 # Corticostriatal projections by subdivision
 summary_ipsi,summary_contra,_,region_labels = csv_to_plot_matrix(path+'Fig3b_cp_cortical_anterograde_projections.csv',
@@ -151,10 +149,10 @@ region_labels = list(summary_contra.index)
 anterograde_heatmap(summary_ipsi,region_labels,'Ipsilateral')
 anterograde_heatmap(summary_contra,region_labels,'Contralateral')
 
-# # FIGURE 5 - Anterograde projections to CP by celltype
+# # FIGURE 3 - Anterograde projections to CP by celltype
 
 summary_ipsi,summary_contra,lat,region_labels = csv_to_plot_matrix(path+'cp_layer_projections_L5merged.csv',
-                                                      path+'harris_order_SSp_MOp_merged.csv',
+                                                      path+'harris_order_smgrouped.csv',
                                                       name_col='cortex_region',
                                                       group='cell_type')
 

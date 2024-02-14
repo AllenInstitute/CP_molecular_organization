@@ -26,28 +26,28 @@ column_names=['experiment_id','ccf_id','ccf_region','layer','x','y','z','total_p
           'CPdm_ipsi','CPvm_ipsi','CPiv_ipsi','CPl_ipsi','CPp_ipsi',
           'CPdm_contra','CPvm_contra','CPiv_contra','CPl_contra','CPp_contra']
 
-# with open(save_filename, mode='a', newline='') as f:
-#     writer = csv.writer(f)
-#     writer.writerow(column_names)
-#     f.close()
+with open(save_filename, mode='a', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(column_names)
+    f.close()
     
 cp_coords = np.load(region_lookup_path+'cp_mask.npy')
 
 def get_swc_filename():
     
-    # mouselight_swc_path = '//allen/programs/celltypes/workgroups/mousecelltypes/_UPENN_fMOST/morphology_data/202205111930_upload_registered_reconstructions/'
-    # ctx_swc_path = '../data/CTX_VIS/'
+    mouselight_swc_path = '//allen/programs/celltypes/workgroups/mousecelltypes/_UPENN_fMOST/morphology_data/202205111930_upload_registered_reconstructions/'
+    ctx_swc_path = '../data/CTX_VIS/'
     
-    # metadata = pd.read_csv('../data/swc_cp_projection_densities_v3.csv')
-    # swc_list = metadata['experiment_id'].to_list()
-    # swc_list = os.listdir(ctx_swc_path)
+    metadata = pd.read_csv('../data/swc_cp_projection_densities_v3.csv')
+    swc_list = metadata['experiment_id'].to_list()
+    swc_list = os.listdir(ctx_swc_path)
     
-    # swc_filelist = []
-    # for value in swc_list:
-    #     # if value[0] =='A':
-    #         # swc_filelist.append(mouselight_swc_path+value+'.swc')
-    #     # else:
-    #     swc_filelist.append(ctx_swc_path+value)#+'_reg.swc')
+    swc_filelist = []
+    for value in swc_list:
+        if value[0] =='A':
+            swc_filelist.append(mouselight_swc_path+value+'.swc')
+        else:
+            swc_filelist.append(ctx_swc_path+value)#+'_reg.swc')
     
     dir_path = Path('../data/Peng_2021_single_neurons/')
     swc_files = dir_path.glob('**/*_reg.swc')

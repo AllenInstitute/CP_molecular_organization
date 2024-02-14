@@ -3,7 +3,7 @@
 Anterograde projection summary stats.
 
  - Loads anterograde volume and masks by subdivision
- - Calculates projection strength and projection density
+ - Calculates projection strength and projection density on an HPC system with multiple cores
  - Saves as a csv
 
 """
