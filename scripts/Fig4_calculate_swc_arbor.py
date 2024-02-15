@@ -67,9 +67,6 @@ def arbor_calculation(args):
     with open('../data/swc_arbor_stats_l23.csv', mode='a', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(row_data)
-        
-
-
 
 if __name__ == '__main__':
 

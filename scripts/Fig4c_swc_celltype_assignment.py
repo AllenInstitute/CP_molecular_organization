@@ -9,7 +9,8 @@ import csv,multiprocessing,nrrd,json,sys,os
 import numpy as np
 from pathlib import Path
 from anytree import Node
-
+from neuron_morphology.swc_io import morphology_from_swc
+from neuron_morphology.feature_extractor.data import Data
 sys.path.append('../src/')
 from swc_tools import *
 
@@ -83,20 +84,51 @@ def assign_celltype(point_set,threshold=5):
     
     return celltype
 
-def process_swc_file(swc_file):
+def process_swc_file(swc_file,is_VIS=True):
     
     volume = np.load(filepath / 'celltype_divisions.npy')
     brain_bounds = np.shape(volume)
     
-    if swc_file[-4:] == '.swc':
+    def load_and_process_VIS(swc_file,resolution):
+        
+        swc_data = morphology_from_swc(swc_file)
+        leaf_nodes = swc_data.get_leaf_nodes()
+        neurites = format_leaf_nodes(leaf_nodes,resolution)
+        
+        return neurites
+    
+    def format_leaf_nodes(leaf_nodes,resolution=10):
+        xyz_position = np.empty((0,3),dtype=int)
+        for point in leaf_nodes:
+            x = int(point['x']/resolution)
+            y = int(point['y']/resolution)
+            z = int(point['z']/resolution)
+            xyz_position = np.vstack([xyz_position,np.array([x,y,z])])
+            
+        return xyz_position
+
+    resolution = 10
+
+    if is_VIS==False:
         swc_file = swc_file.replace('\\','/')
         swc_db = np.genfromtxt(swc_file)
         swc_db = flip_swc(swc_db)
-        swc_graph,soma_coords = db_to_tree(swc_db)
-        neurites = find_leaves(swc_graph,resolution=10)
-    else:
-        row_info = [0]*8
-        return row_info
+        assert swc_db[0,-1]==-1
+        swc_graph = db_to_tree(swc_db)
+        neurites = find_leaves(swc_graph,resolution)
+        
+    elif is_VIS==True:
+        neurites = load_and_process_VIS(swc_file,resolution)
+    
+    # if swc_file[-4:] == '.swc':
+    #     swc_file = swc_file.replace('\\','/')
+    #     swc_db = np.genfromtxt(swc_file)
+    #     swc_db = flip_swc(swc_db)
+    #     swc_graph,soma_coords = db_to_tree(swc_db)
+    #     neurites = find_leaves(swc_graph,resolution=10)
+    # else:
+    #     row_info = [0]*8
+    #     return row_info
     
     brain_divs = [688,623,549,1097,313,1065,512]
     locations=[]
@@ -144,34 +176,17 @@ def main(swc_filelist):
 if __name__ == '__main__':
     
     batch_size = 10
+    swc_path = '../data/CTX_VIS_not_using/'
 
-    # swc_path = '//allen/programs/celltypes/workgroups/mousecelltypes/_UPENN_fMOST/morphology_data/202205111930_upload_registered_reconstructions/'
-    # paths = sorted(Path(swc_path).iterdir(), key=os.path.getmtime)
-    # swc_filelist = os.listdir(swc_path)
-    # swc_path = '../data/Peng_2021_single_neurons/'
-    # swc_path = Path(swc_path)
-    # swc_files = swc_path.glob('**/*_reg.swc')
-    
-    # swc_filtered = pd.read_csv('../data/cp_projection_densities_v3.csv')
-    # swc_filtered_id = swc_filtered['experiment_id'].to_list()[68:]
-    
-    # swc_filepath = [str(file) for file in swc_files]
-    
-    # swc_id = [re.split('\\\\',file)[-1][:-4] for file in swc_filepath]
-    
-    # swc_filelist  = [swc_filepath[idx] for idx, filename in enumerate(swc_id) if filename in swc_filtered_id]
-    # swc_filelist = pd.DataFrame(swc_filelist)
-    # swc_filelist.to_csv('../data/Peng_cortical_neurons.csv')
-    
-    swc_files = pd.read_csv('../data/Peng_cortical_neurons.csv')
-    swc_filelist = swc_files['0'].to_list()
+    swc_filelist = os.listdir(swc_path)
+    swc_filelist = [swc_path+x for x in swc_filelist]
     
     filepath = Path('../data/')
     annotation_volume,_ = nrrd.read(filepath / 'ccf_volumes/annotation_10.nrrd')
 
     brain_divs = [688,623,549,1097,313,1065,512] # Divisions: CTX, CNU, TH, HY,MB, HB, CB
 
-    save_filename = filepath / 'swc_peng.csv'
+    save_filename = filepath / 'swc_CTX_VIS.csv'
     column_names=['experiment_id','CTX','CNU','TH','HY','MB','HB','CB','predicted_celltype']
 
     with open(save_filename, mode='a', newline='') as f:
