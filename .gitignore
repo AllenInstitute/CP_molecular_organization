@@ -1,15 +1,6 @@
-# Ignore subfolders
-
-data/**
-figures/**
-refs/**
-manuscript/**
-scripts/old/**
-
 # File types
 
 *.npy
-*.csv
 *.nrrd
 *.html
 *.nii

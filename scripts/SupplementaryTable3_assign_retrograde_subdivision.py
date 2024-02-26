@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-I/O tools
-
-Functions for input/output of relevant files for hippocampal flattening
+Generation of Supplementary Table 3 - assigning retrograde subdivision based on x,y,z coordinates
 
 """
 import os, nrrd

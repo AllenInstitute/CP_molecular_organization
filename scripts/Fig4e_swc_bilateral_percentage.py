@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-swc_df = pd.read_csv('../data/swc_cp_projection_densities_v3.csv')
+swc_df = pd.read_csv('../data/swc_cp_projection_densities.csv')
 order = pd.read_csv('../data/harris_order.csv')
 order = order['name'].to_numpy()
 

@@ -1,0 +1,26 @@
+name: plotting
+channels:
+  - simpleitk
+  - pyviz
+  - conda-forge
+  - defaults
+dependencies:
+  - bokeh=2.4.3
+  - numpy=1.21.5
+  - pandas=1.4.3
+  - pillow=9.2.0
+  - pip=22.1.2
+  - plotly=5.10.0
+  - python=3.8.13
+  - scikit-image=0.20.0
+  - seaborn=0.12.2
+  - shapely=1.8.5
+  - simpleitk=2.1.1
+  - pip:
+      - allensdk==2.15.1
+      - ccfstreamlines=0.1.1
+      - neuron-morphology==1.1.7
+      - pynrrd==0.4.3
+      - spams
+
+

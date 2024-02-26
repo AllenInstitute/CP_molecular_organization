@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 # Figure 6a - Sankey diagram
 
-df = pd.read_table('../data/Fig6_summary_v3.csv',delimiter=',')
+df = pd.read_table('../data/Fig6_summary.csv',delimiter=',')
 attrs = pd.read_table('../data/Fig6_attrs.csv',delimiter=',')
 
 struct = attrs['structure'].to_numpy()

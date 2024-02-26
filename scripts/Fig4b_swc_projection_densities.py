@@ -132,7 +132,7 @@ def write_to_csv(batch_data):
 
 
 def main():
-    swc_filelist = get_swc_filename('../data/CTX_VIS_not_using/')
+    swc_filelist = get_swc_filename('../data/CTX_VIS/')
 
     batch_size = 20
     pool = multiprocessing.Pool()
