@@ -11,7 +11,7 @@ All analysis and visualization code has been written in Python3. Scripts require
 #### Notes on usage
 
  - Analysis requires CCFv3 annotation volumes not included in this repository. Annotation volumes can be downloaded using the Allen SDK, instructions [here](https://allensdk.readthedocs.io/en/latest/_static/examples/nb/reference_space.html#Downloading-an-annotation-volume).
- - Cortical flatmapping for Figs 3 and 4 is explained in depth [here] (https://ccf-streamlines.readthedocs.io/en/latest/)
+ - Cortical flatmapping for Figs 3 and 4 is explained in depth [here](https://ccf-streamlines.readthedocs.io/en/latest/)
  - The data directory contains sample swcs for generating analyses and figures for Figure 4. 
 
 ### Level of support
